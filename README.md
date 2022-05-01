@@ -23,8 +23,7 @@ cloudflare_api_token = "<secret_token>"
 
 ## Setting up Azure
 
-Make sure you have `direnv` so you can get access to the right accounts. Add
-something like this to a local .env:
+Make sure you have `direnv` so you can get access to the right accounts. Add something like this to a local .env:
 
 ```
 export AZURE_TENANT_ID=8fbc5cea-2448-4779-a0e9-31d74029e14d
@@ -44,22 +43,31 @@ You will need to create an initial resource group and storage account manually v
 
 ```
 az group create --name $RESOURCE_GROUP --location $LOCATION
-
 az storage account create --resource-group $RESOURCE_GROUP --name $STORAGE_ACCOUNT --location $LOCATION --sku Standard_LRS --kind StorageV2
-
 az storage container create --name $STORAGE_CONTAINER_NAME --account-name $STORAGE_ACCOUNT
 ```
+
+If you already have a `terraform.tfstate` from running Terraform locally previously (or setting this up previously), this is the point where you should add it to your storage container so Terraform can use it in the next steps.
 
 # Running terraform
 
 ```
 terraform init
 terraform validate
-terraform plan
+terraform plan --out terraform.plan
 ```
 
-Check that everything looks OK.
+Check that everything looks OK. You will see that it will try to create the already existing state.. This is bad! We need to import what we created in previous steps:
 
 ```
-terraform apply
+terraform import azurerm_resource_group.rg_ahockersten_default /subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP
+terraform import azurerm_storage_account.ahockerstentfstorage /subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT
+terraform import azurerm_storage_container.tf_state https://ahockerstentfstorage.blob.core.windows.net/$STORAGE_CONTAINER_NAME
+```
+
+Now, we can finally apply the terraform config:
+
+```
+terraform plan --out tfplan
+terraform apply tfplan
 ```
