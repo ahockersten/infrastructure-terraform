@@ -1,4 +1,5 @@
 variable "cloudflare_api_token" {
-   description = "The API token to use for Cloudflare"
-   type        = string
+  description = "The API token to use for Cloudflare"
+  type        = string
+  sensitive   = true
 }
