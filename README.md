@@ -23,7 +23,7 @@ cloudflare_api_token = "<secret_token>"
 
 ## Setting up Azure
 
-Make sure you have `direnv` so you can get access to the right accounts. Add something like this to a local .env:
+Make sure you have `direnv` so you can get access to the right accounts. Add something like this to a local .envrc:
 
 ```
 export AZURE_TENANT_ID=8fbc5cea-2448-4779-a0e9-31d74029e14d
@@ -34,7 +34,7 @@ export KUBECONFIG=/home/anders/git/personal/.kubeconfig
 You then need to login to your account with:
 
 ```
-az login --tenant $TENANT_ID
+az login --tenant $AZURE_TENANT_ID
 ```
 
 ## Bootstrapping Azure
