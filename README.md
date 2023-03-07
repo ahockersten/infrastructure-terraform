@@ -1,17 +1,28 @@
-# Useful variables
-
-These are used below, but _also in Terraform's `main.tf`_ (so changing them requires changing there as well)
-
-```
-AZURE_TENANT_ID=8fbc5cea-2448-4779-a0e9-31d74029e14d
-AZURE_SUBSCRIPTION_ID=673d5161-7521-43bd-b861-1838d3b62eb9
-STORAGE_ACCOUNT=ahockerstentfstorage
-STORAGE_CONTAINER_NAME=tf-state
-RESOURCE_GROUP=rg-ahockersten-default
-LOCATION=swedencentral
-```
-
 # Initial setup
+
+## Installing prerequisites
+
+## Adding a GitHub access token
+
+Go to GitHub and create an access token for access to the `ahockersten/tfstate` repo: https://github.com/settings/tokens
+
+It should be enough to give it access to:
+```
+Contents
+  Access: Read and write
+Metadata
+  Access: Read-only
+```
+
+## Adding a Cloudflare access token for your account
+
+Go to cloudflare's page, create an access token here: https://dash.cloudflare.com/profile/api-tokens
+
+It will need access to the following:
+```
+  Anders@hockersten.se's Account
+      All zones - DNS:Edit
+```
 
 ## Adding terraform variables
 
@@ -21,33 +32,13 @@ Create a `terraform.tfvars`. It should contain:
 cloudflare_api_token = "<secret_token>"
 ```
 
-## Setting up Azure
+## Adding environment variables
 
-Make sure you have `direnv` so you can get access to the right accounts. Add something like this to a local .envrc:
-
+You need:
 ```
-export AZURE_TENANT_ID=8fbc5cea-2448-4779-a0e9-31d74029e14d
-export AZURE_CONFIG_DIR=/home/anders/git/personal/.azure
-export KUBECONFIG=/home/anders/git/personal/.kubeconfig
+GIT_USERNAME=ahockersten
+GITHUB_TOKEN=<token created in previous step>
 ```
-
-You then need to login to your account with:
-
-```
-az login --tenant $AZURE_TENANT_ID
-```
-
-## Bootstrapping Azure
-
-You will need to create an initial resource group and storage account manually via the CLI:
-
-```
-az group create --name $RESOURCE_GROUP --location $LOCATION
-az storage account create --resource-group $RESOURCE_GROUP --name $STORAGE_ACCOUNT --location $LOCATION --sku Standard_LRS --kind StorageV2
-az storage container create --name $STORAGE_CONTAINER_NAME --account-name $STORAGE_ACCOUNT
-```
-
-If you already have a `terraform.tfstate` from running Terraform locally previously (or setting this up previously), this is the point where you should add it to your storage container so Terraform can use it in the next steps.
 
 # Running terraform
 
