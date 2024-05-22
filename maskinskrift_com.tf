@@ -1,4 +1,9 @@
-resource "cloudflare_zone" "terraform_managed_resource_8948373d7f1bf16b065a02bb7c6504e7" {
+moved {
+  from = cloudflare_zone.terraform_managed_resource_8948373d7f1bf16b065a02bb7c6504e7
+  to   = cloudflare_zone.maskinskrift_com
+}
+
+resource "cloudflare_zone" "maskinskrift_com" {
   paused = false
   plan   = "free"
   type   = "full"
@@ -11,7 +16,7 @@ resource "cloudflare_record" "terraform_managed_resource_bb10d33ddc80e9103c365af
   ttl     = 1
   type    = "CNAME"
   value   = "fm1.maskinskrift.com.dkim.fmhosted.com"
-  zone_id = "8948373d7f1bf16b065a02bb7c6504e7"
+  zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_23a4e51f725d9f4a3092f941d4c5b9ee" {
@@ -20,7 +25,7 @@ resource "cloudflare_record" "terraform_managed_resource_23a4e51f725d9f4a3092f94
   ttl     = 1
   type    = "CNAME"
   value   = "fm2.maskinskrift.com.dkim.fmhosted.com"
-  zone_id = "8948373d7f1bf16b065a02bb7c6504e7"
+  zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_ac15d6f6a7a06337aa25fac3cf3bdb4e" {
@@ -29,7 +34,7 @@ resource "cloudflare_record" "terraform_managed_resource_ac15d6f6a7a06337aa25fac
   ttl     = 1
   type    = "CNAME"
   value   = "fm3.maskinskrift.com.dkim.fmhosted.com"
-  zone_id = "8948373d7f1bf16b065a02bb7c6504e7"
+  zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_02c3c566681539936ddaf0c51209246b" {
@@ -38,7 +43,7 @@ resource "cloudflare_record" "terraform_managed_resource_02c3c566681539936ddaf0c
   ttl     = 1
   type    = "CNAME"
   value   = "d2jviw1g1h6zo.cloudfront.net"
-  zone_id = "8948373d7f1bf16b065a02bb7c6504e7"
+  zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_3e61b9c365eebd6bf736cc5d9b87c87d" {
@@ -48,7 +53,7 @@ resource "cloudflare_record" "terraform_managed_resource_3e61b9c365eebd6bf736cc5
   ttl      = 1
   type     = "MX"
   value    = "in2-smtp.messagingengine.com"
-  zone_id  = "8948373d7f1bf16b065a02bb7c6504e7"
+  zone_id  = cloudflare_zone.maskinskrift_com.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_48ddc96f82527a88d9089288495e1f00" {
@@ -58,7 +63,7 @@ resource "cloudflare_record" "terraform_managed_resource_48ddc96f82527a88d908928
   ttl      = 1
   type     = "MX"
   value    = "in1-smtp.messagingengine.com"
-  zone_id  = "8948373d7f1bf16b065a02bb7c6504e7"
+  zone_id  = cloudflare_zone.maskinskrift_com.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_0db45f3563046967849f689f6424cde5" {
@@ -67,5 +72,5 @@ resource "cloudflare_record" "terraform_managed_resource_0db45f3563046967849f689
   ttl     = 1
   type    = "TXT"
   value   = "v=spf1 include:spf.messagingengine.com ?all"
-  zone_id = "8948373d7f1bf16b065a02bb7c6504e7"
+  zone_id = cloudflare_zone.maskinskrift_com.id
 }

@@ -1,4 +1,9 @@
-resource "cloudflare_zone" "terraform_managed_resource_ddd94cf572a2dd3b97ece2a5ab86f8c1" {
+moved {
+  from = cloudflare_zone.terraform_managed_resource_ddd94cf572a2dd3b97ece2a5ab86f8c1
+  to   = cloudflare_zone.hockersten_se
+}
+
+resource "cloudflare_zone" "hockersten_se" {
   paused = false
   plan   = "free"
   type   = "full"
@@ -11,7 +16,7 @@ resource "cloudflare_record" "terraform_managed_resource_afd07dbb7df1bf5ab4222c9
   ttl     = 1
   type    = "CNAME"
   value   = "fm1.hockersten.se.dkim.fmhosted.com"
-  zone_id = "ddd94cf572a2dd3b97ece2a5ab86f8c1"
+  zone_id = cloudflare_zone.hockersten_se.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_9e051fea2d6b36c3f111deb09184bbf3" {
@@ -20,7 +25,7 @@ resource "cloudflare_record" "terraform_managed_resource_9e051fea2d6b36c3f111deb
   ttl     = 1
   type    = "CNAME"
   value   = "fm2.hockersten.se.dkim.fmhosted.com"
-  zone_id = "ddd94cf572a2dd3b97ece2a5ab86f8c1"
+  zone_id = cloudflare_zone.hockersten_se.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_4920f5368a85dce13ecc056c61e3ae6b" {
@@ -29,7 +34,7 @@ resource "cloudflare_record" "terraform_managed_resource_4920f5368a85dce13ecc056
   ttl     = 1
   type    = "CNAME"
   value   = "fm3.hockersten.se.dkim.fmhosted.com"
-  zone_id = "ddd94cf572a2dd3b97ece2a5ab86f8c1"
+  zone_id = cloudflare_zone.hockersten_se.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_1b15923b4eac562ba0e43f9347348aee" {
@@ -39,7 +44,7 @@ resource "cloudflare_record" "terraform_managed_resource_1b15923b4eac562ba0e43f9
   ttl      = 1
   type     = "MX"
   value    = "in1-smtp.messagingengine.com"
-  zone_id  = "ddd94cf572a2dd3b97ece2a5ab86f8c1"
+  zone_id  = cloudflare_zone.hockersten_se.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_f17b18d331a9648c1336337984dd10db" {
@@ -49,7 +54,7 @@ resource "cloudflare_record" "terraform_managed_resource_f17b18d331a9648c1336337
   ttl      = 1
   type     = "MX"
   value    = "in2-smtp.messagingengine.com"
-  zone_id  = "ddd94cf572a2dd3b97ece2a5ab86f8c1"
+  zone_id  = cloudflare_zone.hockersten_se.id
 }
 
 resource "cloudflare_record" "terraform_managed_resource_2b2ef5e5b36db190fba05e13114c270d" {
@@ -58,5 +63,5 @@ resource "cloudflare_record" "terraform_managed_resource_2b2ef5e5b36db190fba05e1
   ttl     = 1
   type    = "TXT"
   value   = "v=spf1 include:spf.messagingengine.com ?all"
-  zone_id = "ddd94cf572a2dd3b97ece2a5ab86f8c1"
+  zone_id = cloudflare_zone.hockersten_se.id
 }
