@@ -42,21 +42,16 @@ GITHUB_TOKEN=<token created in previous step>
 
 # Running terraform
 
+Run terraform-backend-git
+```
+terraform-backend-git
+```
+
 ```
 terraform init
-terraform validate
-terraform plan --out terraform.plan
 ```
 
-Check that everything looks OK. You will see that it will try to create the already existing state.. This is bad! We need to import what we created in previous steps:
-
-```
-terraform import azurerm_resource_group.rg_ahockersten_default /subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP
-terraform import azurerm_storage_account.ahockerstentfstorage /subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT
-terraform import azurerm_storage_container.tf_state https://ahockerstentfstorage.blob.core.windows.net/$STORAGE_CONTAINER_NAME
-```
-
-Now, we can finally apply the terraform config:
+Now, we can apply the terraform config:
 
 ```
 terraform plan --out tfplan
