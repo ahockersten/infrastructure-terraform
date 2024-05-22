@@ -1,8 +1,3 @@
-moved {
-  from = cloudflare_zone.terraform_managed_resource_dd81a0b6777f3c28906be028734a53bd
-  to   = cloudflare_zone.orbmit_org
-}
-
 resource "cloudflare_zone" "orbmit_org" {
   paused = false
   plan   = "free"

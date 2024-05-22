@@ -1,8 +1,3 @@
-moved {
-  from = cloudflare_zone.terraform_managed_resource_7a6cc4008e17157d1c4d1bbd05559f12
-  to   = cloudflare_zone.hoeckersten_se
-}
-
 resource "cloudflare_zone" "hoeckersten_se" {
   paused = false
   plan   = "free"

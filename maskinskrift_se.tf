@@ -1,8 +1,3 @@
-moved {
-  from = cloudflare_zone.terraform_managed_resource_8f92ebe16cc21e2ec522a8e138c53ada
-  to   = cloudflare_zone.maskinskrift_se
-}
-
 resource "cloudflare_zone" "maskinskrift_se" {
   paused = false
   plan   = "free"
