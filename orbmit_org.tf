@@ -5,41 +5,41 @@ resource "cloudflare_zone" "orbmit_org" {
   zone   = "orbmit.org"
 }
 
-resource "cloudflare_record" "terraform_managed_resource_4c2a115853b896bb4c33d2cddfb2822c" {
-  name    = "alexandria"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "98.128.175.95"
-  zone_id = cloudflare_zone.orbmit_org.id
-}
-
-resource "cloudflare_record" "terraform_managed_resource_31df9688a32591a135f0c6efde1722e0" {
-  name    = "alexandria"
-  proxied = false
-  ttl     = 1
-  type    = "AAAA"
-  value   = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
-  zone_id = cloudflare_zone.orbmit_org.id
-}
-
-resource "cloudflare_record" "wwwa" {
-  name    = "www"
-  proxied = false
-  ttl     = 1
-  type    = "A"
-  value   = "98.128.175.95"
-  zone_id = cloudflare_zone.orbmit_org.id
-}
-
-resource "cloudflare_record" "wwwaaaa" {
-  name    = "www"
-  proxied = false
-  ttl     = 1
-  type    = "AAAA"
-  value   = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
-  zone_id = cloudflare_zone.orbmit_org.id
-}
+#resource "cloudflare_record" "terraform_managed_resource_4c2a115853b896bb4c33d2cddfb2822c" {
+#  name    = "alexandria"
+#  proxied = false
+#  ttl     = 1
+#  type    = "A"
+#  value   = "98.128.175.95"
+#  zone_id = cloudflare_zone.orbmit_org.id
+#}
+#
+#resource "cloudflare_record" "terraform_managed_resource_31df9688a32591a135f0c6efde1722e0" {
+#  name    = "alexandria"
+#  proxied = false
+#  ttl     = 1
+#  type    = "AAAA"
+#  value   = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
+#  zone_id = cloudflare_zone.orbmit_org.id
+#}
+#
+#resource "cloudflare_record" "wwwa" {
+#  name    = "www"
+#  proxied = false
+#  ttl     = 1
+#  type    = "A"
+#  value   = "98.128.175.95"
+#  zone_id = cloudflare_zone.orbmit_org.id
+#}
+#
+#resource "cloudflare_record" "wwwaaaa" {
+#  name    = "www"
+#  proxied = false
+#  ttl     = 1
+#  type    = "AAAA"
+#  value   = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
+#  zone_id = cloudflare_zone.orbmit_org.id
+#}
 
 resource "cloudflare_record" "terraform_managed_resource_2a97fa825df567175732d4d8c018c780" {
   name    = "fm1._domainkey"
