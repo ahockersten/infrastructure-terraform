@@ -1,12 +1,12 @@
 resource "cloudflare_zone" "hoeckersten_se" {
-  account_id = "112de8987d83411a2230c9d9f52bbe09"
-  paused     = false
-  plan       = "free"
-  type       = "full"
-  zone       = "höckersten.se"
+  account = {
+    id = "112de8987d83411a2230c9d9f52bbe09"
+  }
+  type = "full"
+  name = "höckersten.se"
 }
 
-resource "cloudflare_record" "terraform_managed_resource_736e6a4a3c2667a4c754e5a5608f1e0f" {
+resource "cloudflare_dns_record" "terraform_managed_resource_736e6a4a3c2667a4c754e5a5608f1e0f" {
   name    = "fm1._domainkey"
   proxied = false
   ttl     = 1
@@ -15,7 +15,7 @@ resource "cloudflare_record" "terraform_managed_resource_736e6a4a3c2667a4c754e5a
   zone_id = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_2bcefad424bdbfed5b4a77ee06bbd194" {
+resource "cloudflare_dns_record" "terraform_managed_resource_2bcefad424bdbfed5b4a77ee06bbd194" {
   name    = "fm2._domainkey"
   proxied = false
   ttl     = 1
@@ -24,7 +24,7 @@ resource "cloudflare_record" "terraform_managed_resource_2bcefad424bdbfed5b4a77e
   zone_id = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_fa4f4c05b39d5647083c1be0ea154ba8" {
+resource "cloudflare_dns_record" "terraform_managed_resource_fa4f4c05b39d5647083c1be0ea154ba8" {
   name    = "fm3._domainkey"
   proxied = false
   ttl     = 1
@@ -33,7 +33,7 @@ resource "cloudflare_record" "terraform_managed_resource_fa4f4c05b39d5647083c1be
   zone_id = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_d0a1368a33e4130d91453fdc3d206c27" {
+resource "cloudflare_dns_record" "terraform_managed_resource_d0a1368a33e4130d91453fdc3d206c27" {
   name     = "xn--hckersten-07a.se"
   priority = 10
   proxied  = false
@@ -43,7 +43,7 @@ resource "cloudflare_record" "terraform_managed_resource_d0a1368a33e4130d91453fd
   zone_id  = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_2bcbf64fdcab6c164d5b09f3baf87971" {
+resource "cloudflare_dns_record" "terraform_managed_resource_2bcbf64fdcab6c164d5b09f3baf87971" {
   name     = "xn--hckersten-07a.se"
   priority = 20
   proxied  = false
@@ -53,11 +53,11 @@ resource "cloudflare_record" "terraform_managed_resource_2bcbf64fdcab6c164d5b09f
   zone_id  = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_15b5a5e062a88adcfc6e921c340b0629" {
+resource "cloudflare_dns_record" "terraform_managed_resource_15b5a5e062a88adcfc6e921c340b0629" {
   name    = "xn--hckersten-07a.se"
   proxied = false
   ttl     = 1
   type    = "TXT"
-  content = "v=spf1 include:spf.messagingengine.com ?all"
+  content = "\"v=spf1 include:spf.messagingengine.com ?all\""
   zone_id = cloudflare_zone.hoeckersten_se.id
 }

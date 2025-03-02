@@ -1,9 +1,9 @@
 resource "cloudflare_zone" "orbmit_org" {
-  account_id = "112de8987d83411a2230c9d9f52bbe09"
-  paused     = false
-  plan       = "free"
-  type       = "full"
-  zone       = "orbmit.org"
+  account = {
+    id = "112de8987d83411a2230c9d9f52bbe09"
+  }
+  type = "full"
+  name = "orbmit.org"
 }
 
 #resource "cloudflare_record" "terraform_managed_resource_4c2a115853b896bb4c33d2cddfb2822c" {
@@ -42,7 +42,7 @@ resource "cloudflare_zone" "orbmit_org" {
 #  zone_id = cloudflare_zone.orbmit_org.id
 #}
 
-resource "cloudflare_record" "terraform_managed_resource_2a97fa825df567175732d4d8c018c780" {
+resource "cloudflare_dns_record" "terraform_managed_resource_2a97fa825df567175732d4d8c018c780" {
   name    = "fm1._domainkey"
   proxied = false
   ttl     = 1
@@ -51,7 +51,7 @@ resource "cloudflare_record" "terraform_managed_resource_2a97fa825df567175732d4d
   zone_id = cloudflare_zone.orbmit_org.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_e82e916cf069d40a54af088f1759fd62" {
+resource "cloudflare_dns_record" "terraform_managed_resource_e82e916cf069d40a54af088f1759fd62" {
   name    = "fm2._domainkey"
   proxied = false
   ttl     = 1
@@ -60,7 +60,7 @@ resource "cloudflare_record" "terraform_managed_resource_e82e916cf069d40a54af088
   zone_id = cloudflare_zone.orbmit_org.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_e5926d9d899bcb5cf66cee4c6025b2e0" {
+resource "cloudflare_dns_record" "terraform_managed_resource_e5926d9d899bcb5cf66cee4c6025b2e0" {
   name    = "fm3._domainkey"
   proxied = false
   ttl     = 1
@@ -69,7 +69,7 @@ resource "cloudflare_record" "terraform_managed_resource_e5926d9d899bcb5cf66cee4
   zone_id = cloudflare_zone.orbmit_org.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_c941ed3dcfc115da581b5a7f1d85c222" {
+resource "cloudflare_dns_record" "terraform_managed_resource_c941ed3dcfc115da581b5a7f1d85c222" {
   name     = "orbmit.org"
   priority = 20
   proxied  = false
@@ -79,7 +79,7 @@ resource "cloudflare_record" "terraform_managed_resource_c941ed3dcfc115da581b5a7
   zone_id  = cloudflare_zone.orbmit_org.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_bb9d8de57f82edbbab8ba1f59aa25558" {
+resource "cloudflare_dns_record" "terraform_managed_resource_bb9d8de57f82edbbab8ba1f59aa25558" {
   name     = "orbmit.org"
   priority = 10
   proxied  = false
@@ -89,11 +89,11 @@ resource "cloudflare_record" "terraform_managed_resource_bb9d8de57f82edbbab8ba1f
   zone_id  = cloudflare_zone.orbmit_org.id
 }
 
-resource "cloudflare_record" "terraform_managed_resource_96f9f6ddfcff08445f4e1a71dbbffdbe" {
+resource "cloudflare_dns_record" "terraform_managed_resource_96f9f6ddfcff08445f4e1a71dbbffdbe" {
   name    = "orbmit.org"
   proxied = false
   ttl     = 1
   type    = "TXT"
-  content = "v=spf1 include:spf.messagingengine.com ?all"
+  content = "\"v=spf1 include:spf.messagingengine.com ?all\""
   zone_id = cloudflare_zone.orbmit_org.id
 }
