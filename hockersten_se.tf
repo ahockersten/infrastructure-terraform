@@ -1,8 +1,9 @@
 resource "cloudflare_zone" "hockersten_se" {
-  paused = false
-  plan   = "free"
-  type   = "full"
-  zone   = "hockersten.se"
+  account_id = "112de8987d83411a2230c9d9f52bbe09"
+  paused     = false
+  plan       = "free"
+  type       = "full"
+  zone       = "hockersten.se"
 }
 
 resource "cloudflare_record" "terraform_managed_resource_afd07dbb7df1bf5ab4222c960d7f59a8" {
@@ -10,7 +11,7 @@ resource "cloudflare_record" "terraform_managed_resource_afd07dbb7df1bf5ab4222c9
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm1.hockersten.se.dkim.fmhosted.com"
+  content = "fm1.hockersten.se.dkim.fmhosted.com"
   zone_id = cloudflare_zone.hockersten_se.id
 }
 
@@ -19,7 +20,7 @@ resource "cloudflare_record" "terraform_managed_resource_9e051fea2d6b36c3f111deb
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm2.hockersten.se.dkim.fmhosted.com"
+  content = "fm2.hockersten.se.dkim.fmhosted.com"
   zone_id = cloudflare_zone.hockersten_se.id
 }
 
@@ -28,7 +29,7 @@ resource "cloudflare_record" "terraform_managed_resource_4920f5368a85dce13ecc056
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm3.hockersten.se.dkim.fmhosted.com"
+  content = "fm3.hockersten.se.dkim.fmhosted.com"
   zone_id = cloudflare_zone.hockersten_se.id
 }
 
@@ -38,7 +39,7 @@ resource "cloudflare_record" "terraform_managed_resource_1b15923b4eac562ba0e43f9
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in1-smtp.messagingengine.com"
+  content  = "in1-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.hockersten_se.id
 }
 
@@ -48,7 +49,7 @@ resource "cloudflare_record" "terraform_managed_resource_f17b18d331a9648c1336337
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in2-smtp.messagingengine.com"
+  content  = "in2-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.hockersten_se.id
 }
 
@@ -57,6 +58,6 @@ resource "cloudflare_record" "terraform_managed_resource_2b2ef5e5b36db190fba05e1
   proxied = false
   ttl     = 1
   type    = "TXT"
-  value   = "v=spf1 include:spf.messagingengine.com ?all"
+  content = "v=spf1 include:spf.messagingengine.com ?all"
   zone_id = cloudflare_zone.hockersten_se.id
 }

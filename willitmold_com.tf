@@ -1,8 +1,9 @@
 resource "cloudflare_zone" "willitmold_com" {
-  paused = false
-  plan   = "free"
-  type   = "full"
-  zone   = "willitmold.com"
+  account_id = "112de8987d83411a2230c9d9f52bbe09"
+  paused     = false
+  plan       = "free"
+  type       = "full"
+  zone       = "willitmold.com"
 }
 
 resource "cloudflare_record" "willitmold_com" {
@@ -10,7 +11,7 @@ resource "cloudflare_record" "willitmold_com" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "will-it-mold.pages.dev"
+  content = "will-it-mold.pages.dev"
   zone_id = cloudflare_zone.willitmold_com.id
 }
 
@@ -19,7 +20,7 @@ resource "cloudflare_record" "www_willitmold_com" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "will-it-mold.pages.dev"
+  content = "will-it-mold.pages.dev"
   zone_id = cloudflare_zone.willitmold_com.id
 }
 
@@ -29,7 +30,7 @@ resource "cloudflare_record" "mx1_willitmold_com" {
   priority = 10
   ttl      = 1
   type     = "MX"
-  value    = "in1-smtp.messagingengine.com"
+  content  = "in1-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.willitmold_com.id
 }
 
@@ -39,7 +40,7 @@ resource "cloudflare_record" "mx2_willitmold_com" {
   priority = 20
   ttl      = 1
   type     = "MX"
-  value    = "in2-smtp.messagingengine.com"
+  content  = "in2-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.willitmold_com.id
 }
 
@@ -48,7 +49,7 @@ resource "cloudflare_record" "dkim1_willitmold_com" {
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm1.willitmold.com.dkim.fmhosted.com"
+  content = "fm1.willitmold.com.dkim.fmhosted.com"
   zone_id = cloudflare_zone.willitmold_com.id
 }
 
@@ -57,7 +58,7 @@ resource "cloudflare_record" "dkim2_willitmold_com" {
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm2.willitmold.com.dkim.fmhosted.com"
+  content = "fm2.willitmold.com.dkim.fmhosted.com"
   zone_id = cloudflare_zone.willitmold_com.id
 }
 
@@ -66,7 +67,7 @@ resource "cloudflare_record" "dkim3_willitmold_com" {
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm3.willitmold.com.dkim.fmhosted.com"
+  content = "fm3.willitmold.com.dkim.fmhosted.com"
   zone_id = cloudflare_zone.willitmold_com.id
 }
 
@@ -75,6 +76,6 @@ resource "cloudflare_record" "spf_willitmold_com" {
   proxied = false
   ttl     = 1
   type    = "TXT"
-  value   = "v=spf1 include:spf.messagingengine.com ?all"
+  content = "v=spf1 include:spf.messagingengine.com ?all"
   zone_id = cloudflare_zone.willitmold_com.id
 }

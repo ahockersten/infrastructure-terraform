@@ -30,3 +30,6 @@ terraform.rc
 .env
 tfplan
 .envrc
+
+# Script used for running terraform-backend-git
+/terraform-backend-git.sh

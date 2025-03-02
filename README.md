@@ -32,19 +32,21 @@ Create a `terraform.tfvars`. It should contain:
 cloudflare_api_token = "<secret_token>"
 ```
 
-## Adding environment variables
+## Creating a script for running terraform-backend-git
 
 You need:
 ```
-GIT_USERNAME=ahockersten
-GITHUB_TOKEN=<token created in previous step>
+echo "export GIT_USERNAME=ahockersten" > terraform-backend-git.sh
+echo "export GITHUB_TOKEN=<token created in previous step>" >> terraform-backend-git.sh
+echo "terraform-backend-git" >> terraform-backend-git.sh
+chmod +x terraform-backend-git.sh
 ```
 
 # Running terraform
 
 Run terraform-backend-git
 ```
-terraform-backend-git
+./terraform-backend-git.sh
 ```
 
 ```

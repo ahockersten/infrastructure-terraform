@@ -1,8 +1,9 @@
 resource "cloudflare_zone" "maskinskrift_com" {
-  paused = false
-  plan   = "free"
-  type   = "full"
-  zone   = "maskinskrift.com"
+  account_id = "112de8987d83411a2230c9d9f52bbe09"
+  paused     = false
+  plan       = "free"
+  type       = "full"
+  zone       = "maskinskrift.com"
 }
 
 resource "cloudflare_record" "terraform_managed_resource_bb10d33ddc80e9103c365af22963b287" {
@@ -10,7 +11,7 @@ resource "cloudflare_record" "terraform_managed_resource_bb10d33ddc80e9103c365af
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm1.maskinskrift.com.dkim.fmhosted.com"
+  content = "fm1.maskinskrift.com.dkim.fmhosted.com"
   zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
@@ -19,7 +20,7 @@ resource "cloudflare_record" "terraform_managed_resource_23a4e51f725d9f4a3092f94
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm2.maskinskrift.com.dkim.fmhosted.com"
+  content = "fm2.maskinskrift.com.dkim.fmhosted.com"
   zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
@@ -28,7 +29,7 @@ resource "cloudflare_record" "terraform_managed_resource_ac15d6f6a7a06337aa25fac
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm3.maskinskrift.com.dkim.fmhosted.com"
+  content = "fm3.maskinskrift.com.dkim.fmhosted.com"
   zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
@@ -37,7 +38,7 @@ resource "cloudflare_record" "terraform_managed_resource_02c3c566681539936ddaf0c
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "d2jviw1g1h6zo.cloudfront.net"
+  content = "d2jviw1g1h6zo.cloudfront.net"
   zone_id = cloudflare_zone.maskinskrift_com.id
 }
 
@@ -47,7 +48,7 @@ resource "cloudflare_record" "terraform_managed_resource_3e61b9c365eebd6bf736cc5
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in2-smtp.messagingengine.com"
+  content  = "in2-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.maskinskrift_com.id
 }
 
@@ -57,7 +58,7 @@ resource "cloudflare_record" "terraform_managed_resource_48ddc96f82527a88d908928
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in1-smtp.messagingengine.com"
+  content  = "in1-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.maskinskrift_com.id
 }
 
@@ -66,6 +67,6 @@ resource "cloudflare_record" "terraform_managed_resource_0db45f3563046967849f689
   proxied = false
   ttl     = 1
   type    = "TXT"
-  value   = "v=spf1 include:spf.messagingengine.com ?all"
+  content = "v=spf1 include:spf.messagingengine.com ?all"
   zone_id = cloudflare_zone.maskinskrift_com.id
 }

@@ -1,8 +1,9 @@
 resource "cloudflare_zone" "maskinskrift_se" {
-  paused = false
-  plan   = "free"
-  type   = "full"
-  zone   = "maskinskrift.se"
+  account_id = "112de8987d83411a2230c9d9f52bbe09"
+  paused     = false
+  plan       = "free"
+  type       = "full"
+  zone       = "maskinskrift.se"
 }
 
 resource "cloudflare_record" "terraform_managed_resource_59b3c25e226af5efaf049bd13944eacb" {
@@ -10,7 +11,7 @@ resource "cloudflare_record" "terraform_managed_resource_59b3c25e226af5efaf049bd
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm1.maskinskrift.se.dkim.fmhosted.com"
+  content = "fm1.maskinskrift.se.dkim.fmhosted.com"
   zone_id = cloudflare_zone.maskinskrift_se.id
 }
 
@@ -19,7 +20,7 @@ resource "cloudflare_record" "terraform_managed_resource_bdcf5c61057f752e38815eb
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm2.maskinskrift.se.dkim.fmhosted.com"
+  content = "fm2.maskinskrift.se.dkim.fmhosted.com"
   zone_id = cloudflare_zone.maskinskrift_se.id
 }
 
@@ -28,7 +29,7 @@ resource "cloudflare_record" "terraform_managed_resource_a1fb7b321ada485bbda592d
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm3.maskinskrift.se.dkim.fmhosted.com"
+  content = "fm3.maskinskrift.se.dkim.fmhosted.com"
   zone_id = cloudflare_zone.maskinskrift_se.id
 }
 
@@ -38,7 +39,7 @@ resource "cloudflare_record" "terraform_managed_resource_c94ffe8fb895adac6f33937
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in2-smtp.messagingengine.com"
+  content  = "in2-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.maskinskrift_se.id
 }
 
@@ -48,7 +49,7 @@ resource "cloudflare_record" "terraform_managed_resource_0bb043a3ec43ff3d8e46a15
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in1-smtp.messagingengine.com"
+  content  = "in1-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.maskinskrift_se.id
 }
 
@@ -57,6 +58,6 @@ resource "cloudflare_record" "terraform_managed_resource_3d37f9bb971f0085b72ac27
   proxied = false
   ttl     = 1
   type    = "TXT"
-  value   = "v=spf1 include:spf.messagingengine.com ?all"
+  content = "v=spf1 include:spf.messagingengine.com ?all"
   zone_id = cloudflare_zone.maskinskrift_se.id
 }

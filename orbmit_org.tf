@@ -1,8 +1,9 @@
 resource "cloudflare_zone" "orbmit_org" {
-  paused = false
-  plan   = "free"
-  type   = "full"
-  zone   = "orbmit.org"
+  account_id = "112de8987d83411a2230c9d9f52bbe09"
+  paused     = false
+  plan       = "free"
+  type       = "full"
+  zone       = "orbmit.org"
 }
 
 #resource "cloudflare_record" "terraform_managed_resource_4c2a115853b896bb4c33d2cddfb2822c" {
@@ -10,7 +11,7 @@ resource "cloudflare_zone" "orbmit_org" {
 #  proxied = false
 #  ttl     = 1
 #  type    = "A"
-#  value   = "98.128.175.95"
+#  content = "98.128.175.95"
 #  zone_id = cloudflare_zone.orbmit_org.id
 #}
 #
@@ -19,7 +20,7 @@ resource "cloudflare_zone" "orbmit_org" {
 #  proxied = false
 #  ttl     = 1
 #  type    = "AAAA"
-#  value   = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
+#  content = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
 #  zone_id = cloudflare_zone.orbmit_org.id
 #}
 #
@@ -28,7 +29,7 @@ resource "cloudflare_zone" "orbmit_org" {
 #  proxied = false
 #  ttl     = 1
 #  type    = "A"
-#  value   = "98.128.175.95"
+#  content = "98.128.175.95"
 #  zone_id = cloudflare_zone.orbmit_org.id
 #}
 #
@@ -37,7 +38,7 @@ resource "cloudflare_zone" "orbmit_org" {
 #  proxied = false
 #  ttl     = 1
 #  type    = "AAAA"
-#  value   = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
+#  content = "2001:9b1:26fa:1900:7285:c2ff:fe70:895c"
 #  zone_id = cloudflare_zone.orbmit_org.id
 #}
 
@@ -46,7 +47,7 @@ resource "cloudflare_record" "terraform_managed_resource_2a97fa825df567175732d4d
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm1.orbmit.org.dkim.fmhosted.com"
+  content = "fm1.orbmit.org.dkim.fmhosted.com"
   zone_id = cloudflare_zone.orbmit_org.id
 }
 
@@ -55,7 +56,7 @@ resource "cloudflare_record" "terraform_managed_resource_e82e916cf069d40a54af088
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm2.orbmit.org.dkim.fmhosted.com"
+  content = "fm2.orbmit.org.dkim.fmhosted.com"
   zone_id = cloudflare_zone.orbmit_org.id
 }
 
@@ -64,7 +65,7 @@ resource "cloudflare_record" "terraform_managed_resource_e5926d9d899bcb5cf66cee4
   proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "fm3.orbmit.org.dkim.fmhosted.com"
+  content = "fm3.orbmit.org.dkim.fmhosted.com"
   zone_id = cloudflare_zone.orbmit_org.id
 }
 
@@ -74,7 +75,7 @@ resource "cloudflare_record" "terraform_managed_resource_c941ed3dcfc115da581b5a7
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in2-smtp.messagingengine.com"
+  content  = "in2-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.orbmit_org.id
 }
 
@@ -84,7 +85,7 @@ resource "cloudflare_record" "terraform_managed_resource_bb9d8de57f82edbbab8ba1f
   proxied  = false
   ttl      = 1
   type     = "MX"
-  value    = "in1-smtp.messagingengine.com"
+  content  = "in1-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.orbmit_org.id
 }
 
@@ -93,6 +94,6 @@ resource "cloudflare_record" "terraform_managed_resource_96f9f6ddfcff08445f4e1a7
   proxied = false
   ttl     = 1
   type    = "TXT"
-  value   = "v=spf1 include:spf.messagingengine.com ?all"
+  content = "v=spf1 include:spf.messagingengine.com ?all"
   zone_id = cloudflare_zone.orbmit_org.id
 }
