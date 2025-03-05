@@ -4,6 +4,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5.0"
     }
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+    }
   }
   backend "http" {
     address        = "http://localhost:6061/?type=git&ref=main&state=state.json&repository=https://github.com/ahockersten/tfstate.git"
@@ -14,4 +18,8 @@ terraform {
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+}
+
+provider "google" {
+  project = "vaultwarden-452515"
 }

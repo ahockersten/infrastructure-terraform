@@ -59,3 +59,21 @@ Now, we can apply the terraform config:
 terraform plan --out tfplan
 terraform apply tfplan
 ```
+
+# How Vaultwarden was setup
+
+First, I created a project in the Google console named `vaultwarden`. In my case it got named `vaultwarden-452515`.
+
+Enable Cloud Run API for it: https://console.cloud.google.com/apis/library/run.googleapis.com?project=vaultwarden-452515&inv=1&invt=Abq-gQ
+
+Enable Site Verification API for it: https://console.cloud.google.com/marketplace/product/google/siteverification.googleapis.com?q=search&referrer=search&inv=1&invt=AbrPhw&project=vaultwarden-452515
+
+
+```
+gcloud auth application-default login
+```
+
+Run
+```
+terraform apply
+```
