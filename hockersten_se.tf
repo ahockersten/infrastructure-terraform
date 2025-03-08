@@ -61,3 +61,12 @@ resource "cloudflare_dns_record" "terraform_managed_resource_2b2ef5e5b36db190fba
   content = "\"v=spf1 include:spf.messagingengine.com ?all\""
   zone_id = cloudflare_zone.hockersten_se.id
 }
+
+resource "cloudflare_dns_record" "hockersten_se_google_site_verification" {
+  name    = "hockersten.se"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  content = "\"google-site-verification=VP2XBnOcA-avhb_Nyp__WF-0AUSHtAIp-1JDfXTUQ58\""
+  zone_id = cloudflare_zone.hockersten_se.id
+}

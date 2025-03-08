@@ -25,6 +25,10 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
         value = "8080"
       }
       env {
+        name  = "SIGNUPS_ALLOWED"
+        value = "false"
+      }
+      env {
         name  = "SIGNUPS_DOMAINS_WHITELIST"
         value = "hockersten.se"
       }
@@ -47,6 +51,9 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
 resource "google_storage_bucket" "vaultwarden" {
   name     = "ahockersten-vaultwarden-data"
   location = "EUROPE-NORTH1"
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_cloud_run_v2_service_iam_member" "noauth" {
@@ -57,8 +64,8 @@ resource "google_cloud_run_v2_service_iam_member" "noauth" {
 }
 
 resource "google_cloud_run_domain_mapping" "vaultwarden" {
-  location = "europe-north1"
-  name     = "hockersten.se"
+  location = google_cloud_run_v2_service.vaultwarden.location
+  name     = "vaultwarden.hockersten.se"
 
   metadata {
     namespace = google_cloud_run_v2_service.vaultwarden.project
@@ -69,23 +76,16 @@ resource "google_cloud_run_domain_mapping" "vaultwarden" {
   }
 }
 
-resource "cloudflare_dns_record" "google_site_verification" {
-  name    = "_google-site-verification"
-  proxied = false
-  ttl     = 3600
-  type    = "TXT"
-  # with https removed
-  content = ""
-  zone_id = cloudflare_zone.hockersten_se.id
-}
-
-
 resource "cloudflare_dns_record" "vaultwarden_hockersten_se" {
-  name    = "vaultwarden"
+  for_each = {
+    for idx, record in google_cloud_run_domain_mapping.vaultwarden.status[0].resource_records :
+    idx => record
+  }
+
+  name    = each.value.name != "" ? each.value.name : "vaultwarden"
   proxied = true
   ttl     = 1
-  type    = "CNAME"
-  # with https removed
-  content = replace(google_cloud_run_v2_service.vaultwarden.uri, "https://", "")
+  type    = each.value.type
+  content = each.value.rrdata
   zone_id = cloudflare_zone.hockersten_se.id
 }

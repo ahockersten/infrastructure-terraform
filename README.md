@@ -66,7 +66,7 @@ First, I created a project in the Google console named `vaultwarden`. In my case
 
 Enable Cloud Run API for it: https://console.cloud.google.com/apis/library/run.googleapis.com?project=vaultwarden-452515&inv=1&invt=Abq-gQ
 
-Enable Site Verification API for it: https://console.cloud.google.com/marketplace/product/google/siteverification.googleapis.com?q=search&referrer=search&inv=1&invt=AbrPhw&project=vaultwarden-452515
+Verify the applicable domain: https://search.google.com/search-console/welcome?domain=hockersten.se
 
 
 ```
@@ -75,5 +75,53 @@ gcloud auth application-default login
 
 Run
 ```
+terraform apply -target google_cloud_run_domain_mapping.vaultwarden
 terraform apply
 ```
+
+## Cloudflare hack 1
+
+In order for Google to be able to do an ACME challenge, I needed to create a WAF rule for Cloudflare. Apparently their new terraform provider does not have this yet. Here is an export:
+
+```
+curl -X PATCH \
+	"https://api.cloudflare.com/client/v4/zones/ddd94cf572a2dd3b97ece2a5ab86f8c1/rulesets/da8a379072a24ef0a2ee4fcdc514fecd/rules/57465443b314475f8efccac5a655c374" \
+	-H "Authorization: Bearer $CF_AUTH_TOKEN" \
+ -d '{
+    "action": "skip",
+    "action_parameters": {
+        "phases": [
+            "http_ratelimit",
+            "http_request_sbfm",
+            "http_request_firewall_managed"
+        ],
+        "products": [
+            "zoneLockdown",
+            "uaBlock",
+            "bic",
+            "hot",
+            "securityLevel",
+            "rateLimit",
+            "waf"
+        ],
+        "ruleset": "current"
+    },
+    "description": "Allow ACME challenge",
+    "enabled": true,
+    "expression": "(http.request.uri.path wildcard r\"/.well-known/acme-challenge/*\")",
+    "id": "57465443b314475f8efccac5a655c374",
+    "last_updated": "2025-03-08T06:31:10.095645Z",
+    "logging": {
+        "enabled": true
+    },
+    "ref": "57465443b314475f8efccac5a655c374",
+    "version": "1",
+    "position": {
+        "index": 1
+    }
+}'
+```
+
+## Cloudflare hack 2
+
+I needed to change the SSL/TLS encryption from "automatic" to "full" after Google had issued the certificate. Then I could change it back again. Probably Cloudflare had sorted itself out if I had just waited?
