@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 6.0"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 6.0"
+    }
   }
   backend "http" {
     address        = "http://localhost:6061/?type=git&ref=main&state=state.json&repository=https://github.com/ahockersten/tfstate.git"
