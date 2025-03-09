@@ -1,5 +1,10 @@
 data "google_project" "project" {}
 
+resource "google_service_account" "vaultwarden_service_account" {
+  account_id   = "vault-warden-service-account"
+  display_name = "Vaultwarden Service Account"
+}
+
 resource "google_cloud_run_v2_service" "vaultwarden" {
   provider             = google-beta
   name                 = "vaultwarden"
@@ -53,6 +58,79 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
   }
 }
 
+resource "google_cloud_run_v2_job" "vaultwarden_backup" {
+  name                = "vaultwarden-backup-job"
+  location            = "europe-north1"
+  deletion_protection = false
+
+  template {
+    task_count = 1
+
+    template {
+      containers {
+        image = "docker.io/ttionya/vaultwarden-backup:latest"
+        args  = ["backup"]
+
+        env {
+          name  = "DATA_DIR"
+          value = "/data"
+        }
+        env {
+          name  = "RCLONE_REMOTE_DIR"
+          value = "/backup"
+        }
+
+        volume_mounts {
+          name       = "bucket"
+          mount_path = "/data"
+        }
+        volume_mounts {
+          name       = "backup"
+          mount_path = "/backup"
+        }
+      }
+
+      volumes {
+        name = "bucket"
+        gcs {
+          bucket    = google_storage_bucket.vaultwarden.name
+          read_only = false
+        }
+      }
+      volumes {
+        name = "backup"
+        gcs {
+          bucket    = google_storage_bucket.vaultwarden_backup.name
+          read_only = false
+        }
+      }
+    }
+  }
+}
+
+#resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
+#  provider         = google-beta
+#  name             = "schedule-job"
+#  description      = "Vaultwarden backup job"
+#  schedule         = "*/5 * * * *"
+#  attempt_deadline = "320s"
+#  region           = "us-east1"
+#  project          = data.google_project.project.project_id
+#
+#  retry_config {
+#    retry_count = 3
+#  }
+#
+#  http_target {
+#    http_method = "POST"
+#    uri         = "https://${google_cloud_run_v2_job.vaultwarden_backup.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${data.google_project.project.number}/jobs/${google_cloud_run_v2_job.vaultwarden_backup.name}:run"
+#
+#    oauth_token {
+#      service_account_email = google_service_account.vaultwarden_service_account.email
+#    }
+#  }
+#}
+
 resource "google_storage_bucket" "vaultwarden" {
   name     = "ahockersten-vaultwarden-data"
   location = "EUROPE-NORTH1"
@@ -60,6 +138,15 @@ resource "google_storage_bucket" "vaultwarden" {
     prevent_destroy = true
   }
 }
+
+resource "google_storage_bucket" "vaultwarden_backup" {
+  name     = "ahockersten-vaultwarden-backup"
+  location = "EUROPE-NORTH1"
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 
 resource "google_cloud_run_v2_service_iam_member" "noauth" {
   location = google_cloud_run_v2_service.vaultwarden.location
