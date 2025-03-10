@@ -108,7 +108,7 @@ resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
   provider    = google-beta
   name        = "schedule-job"
   description = "Vaultwarden backup job"
-  schedule    = "37 1 * * *" # Run once a day at 01:37
+  schedule    = "37 1 * * 0" # Run once a week at 01:37 on Sundays
   # TODO change to europe-north1 when available
   # https://cloud.google.com/scheduler/docs/locations
   region  = "europe-west1"
@@ -139,6 +139,14 @@ resource "google_storage_bucket" "vaultwarden" {
 resource "google_storage_bucket" "vaultwarden_backup" {
   name     = "ahockersten-vaultwarden-backup"
   location = "EUROPE-NORTH1"
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      age = 365
+    }
+  }
   lifecycle {
     prevent_destroy = true
   }
