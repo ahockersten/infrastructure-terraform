@@ -5,6 +5,12 @@ resource "google_service_account" "vaultwarden_service_account" {
   display_name = "Vaultwarden Service Account"
 }
 
+resource "google_project_iam_member" "cloudrun_job_executor" {
+  project = data.google_project.project.project_id
+  role    = "roles/run.jobsExecutor"
+  member  = "serviceAccount:${google_service_account.vaultwarden_service_account.email}"
+}
+
 resource "google_cloud_run_v2_service" "vaultwarden" {
   provider             = google-beta
   name                 = "vaultwarden"
@@ -68,17 +74,7 @@ resource "google_cloud_run_v2_job" "vaultwarden_backup" {
 
     template {
       containers {
-        image = "docker.io/ttionya/vaultwarden-backup:latest"
-        args  = ["backup"]
-
-        env {
-          name  = "DATA_DIR"
-          value = "/data"
-        }
-        env {
-          name  = "RCLONE_REMOTE_DIR"
-          value = "/backup"
-        }
+        image = "docker.io/ahockersten/vaultwarden-backup:latest"
 
         volume_mounts {
           name       = "bucket"
@@ -108,28 +104,29 @@ resource "google_cloud_run_v2_job" "vaultwarden_backup" {
   }
 }
 
-#resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
-#  provider         = google-beta
-#  name             = "schedule-job"
-#  description      = "Vaultwarden backup job"
-#  schedule         = "*/5 * * * *"
-#  attempt_deadline = "320s"
-#  region           = "us-east1"
-#  project          = data.google_project.project.project_id
-#
-#  retry_config {
-#    retry_count = 3
-#  }
-#
-#  http_target {
-#    http_method = "POST"
-#    uri         = "https://${google_cloud_run_v2_job.vaultwarden_backup.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${data.google_project.project.number}/jobs/${google_cloud_run_v2_job.vaultwarden_backup.name}:run"
-#
-#    oauth_token {
-#      service_account_email = google_service_account.vaultwarden_service_account.email
-#    }
-#  }
-#}
+resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
+  provider    = google-beta
+  name        = "schedule-job"
+  description = "Vaultwarden backup job"
+  schedule    = "37 1 * * *" # Run once a day at 01:37
+  # TODO change to europe-north1 when available
+  # https://cloud.google.com/scheduler/docs/locations
+  region  = "europe-west1"
+  project = data.google_project.project.project_id
+
+  retry_config {
+    retry_count = 3
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://${google_cloud_run_v2_job.vaultwarden_backup.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${data.google_project.project.project_id}/jobs/${google_cloud_run_v2_job.vaultwarden_backup.name}:run"
+
+    oauth_token {
+      service_account_email = google_service_account.vaultwarden_service_account.email
+    }
+  }
+}
 
 resource "google_storage_bucket" "vaultwarden" {
   name     = "ahockersten-vaultwarden-data"
