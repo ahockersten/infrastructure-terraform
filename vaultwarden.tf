@@ -27,6 +27,8 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
         container_port = 8080
       }
       resources {
+        cpu_idle = true
+
         limits = {
           cpu    = "1"
           memory = "512Mi"
