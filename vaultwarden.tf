@@ -30,7 +30,7 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
         cpu_idle = true
 
         limits = {
-          cpu    = "1"
+          cpu    = "1000m"
           memory = "512Mi"
         }
       }
