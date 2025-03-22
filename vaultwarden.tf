@@ -22,6 +22,7 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
 
   template {
     containers {
+      name  = "vaultwarden"
       image = "docker.io/vaultwarden/server:latest-alpine"
       ports {
         container_port = 8080
