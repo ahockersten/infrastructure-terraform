@@ -56,6 +56,10 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
         mount_path = "/data"
       }
     }
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 2
+    }
 
     volumes {
       name = "bucket"
