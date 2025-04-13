@@ -136,16 +136,18 @@ resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
 }
 
 resource "google_storage_bucket" "vaultwarden" {
-  name     = "ahockersten-vaultwarden-data"
-  location = "EUROPE-NORTH1"
+  name                     = "ahockersten-vaultwarden-data"
+  location                 = "EUROPE-NORTH1"
+  public_access_prevention = "enforced"
   lifecycle {
     prevent_destroy = true
   }
 }
 
 resource "google_storage_bucket" "vaultwarden_backup" {
-  name     = "ahockersten-vaultwarden-backup"
-  location = "EUROPE-NORTH1"
+  name                     = "ahockersten-vaultwarden-backup"
+  location                 = "EUROPE-NORTH1"
+  public_access_prevention = "enforced"
   lifecycle_rule {
     action {
       type = "Delete"
