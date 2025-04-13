@@ -66,6 +66,8 @@ First, I created a project in the Google console named `vaultwarden`. In my case
 
 Enable Cloud Run API for it: https://console.cloud.google.com/apis/library/run.googleapis.com?project=vaultwarden-452515&inv=1&invt=Abq-gQ
 
+Enable Secret Manager API: https://console.cloud.google.com/apis/enableflow?apiid=secretmanager.googleapis.com&invt=AbuoDg&project=vaultwarden-452515
+
 Enable Cloud Scheduler API for it: https://console.cloud.google.com/apis/api/cloudscheduler.googleapis.com/overview?project=vaultwarden-452515&inv=1&invt=AbrjLg
 
 Verify the applicable domain: https://search.google.com/search-console/welcome?domain=hockersten.se
@@ -80,6 +82,9 @@ Run
 terraform apply -target google_cloud_run_domain_mapping.vaultwarden
 terraform apply
 ```
+
+The automation will have created the secrets necessary, but you still need to go into the Secret Manager UI and fill them in:
+https://console.cloud.google.com/security/secret-manager?invt=AbuoFg&project=vaultwarden-452515
 
 ## Cloudflare hack 1
 

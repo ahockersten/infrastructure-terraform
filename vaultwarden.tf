@@ -1,14 +1,35 @@
 data "google_project" "project" {}
 
-resource "google_service_account" "vaultwarden_service_account" {
-  account_id   = "vault-warden-service-account"
-  display_name = "Vaultwarden Service Account"
+# This is used so the backup scheduled job is allowed to start the cloud run job
+resource "google_service_account" "backup_job_service_account" {
+  account_id   = "backup-job-service-account"
+  display_name = "Vaultwarden Backup Job Service Account"
 }
 
 resource "google_project_iam_member" "cloudrun_job_executor" {
   project = data.google_project.project.project_id
   role    = "roles/run.jobsExecutor"
-  member  = "serviceAccount:${google_service_account.vaultwarden_service_account.email}"
+  member  = "serviceAccount:${google_service_account.backup_job_service_account.email}"
+}
+
+# This is used so the cloud run job can access the secret manager
+resource "google_service_account" "vaultwarden_service_account" {
+  account_id   = "vaultwarden-service-account"
+  display_name = "Vaultwarden Service Account"
+}
+
+resource "google_secret_manager_secret" "admin_token" {
+  secret_id = "admin-token"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "secret_accessor_admin_token" {
+  secret_id  = google_secret_manager_secret.admin_token.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.vaultwarden_service_account.email}"
+  depends_on = [google_secret_manager_secret.admin_token]
 }
 
 resource "google_cloud_run_v2_service" "vaultwarden" {
@@ -51,6 +72,15 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
         name  = "SIGNUPS_DOMAINS_WHITELIST"
         value = "hockersten.se"
       }
+      env {
+        name = "ADMIN_TOKEN"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.admin_token.secret_id
+            version = "latest"
+          }
+        }
+      }
       volume_mounts {
         name       = "bucket"
         mount_path = "/data"
@@ -68,6 +98,7 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
         read_only = false
       }
     }
+    service_account = google_service_account.vaultwarden_service_account.email
   }
 }
 
@@ -130,7 +161,7 @@ resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
     uri         = "https://${google_cloud_run_v2_job.vaultwarden_backup.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${data.google_project.project.project_id}/jobs/${google_cloud_run_v2_job.vaultwarden_backup.name}:run"
 
     oauth_token {
-      service_account_email = google_service_account.vaultwarden_service_account.email
+      service_account_email = google_service_account.backup_job_service_account.email
     }
   }
 }
@@ -142,6 +173,27 @@ resource "google_storage_bucket" "vaultwarden" {
   lifecycle {
     prevent_destroy = true
   }
+}
+
+# let vaultwarden access its bucket
+resource "google_storage_bucket_iam_member" "vaultwarden_access_vaultwarden" {
+  bucket = google_storage_bucket.vaultwarden.name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.vaultwarden_service_account.email}"
+}
+
+# let vaultwarden backup job access the vaultwarden bucket
+resource "google_storage_bucket_iam_member" "backup_access_vaultwarden" {
+  bucket = google_storage_bucket.vaultwarden.name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.backup_job_service_account.email}"
+}
+
+# let vaultwarden backup job access the backup bucket
+resource "google_storage_bucket_iam_member" "backup_access_backup" {
+  bucket = google_storage_bucket.vaultwarden_backup.name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.backup_job_service_account.email}"
 }
 
 resource "google_storage_bucket" "vaultwarden_backup" {
