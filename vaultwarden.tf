@@ -72,15 +72,16 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
         name  = "SIGNUPS_DOMAINS_WHITELIST"
         value = "hockersten.se"
       }
-      env {
-        name = "ADMIN_TOKEN"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.admin_token.secret_id
-            version = "latest"
-          }
-        }
-      }
+      # enable this if you need access to the admin account for some reason
+      #env {
+      #  name = "ADMIN_TOKEN"
+      #  value_source {
+      #    secret_key_ref {
+      #      secret  = google_secret_manager_secret.admin_token.secret_id
+      #      version = "latest"
+      #    }
+      #  }
+      #}
       volume_mounts {
         name       = "bucket"
         mount_path = "/data"
