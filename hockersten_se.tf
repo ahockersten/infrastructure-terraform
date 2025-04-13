@@ -70,3 +70,39 @@ resource "cloudflare_dns_record" "hockersten_se_google_site_verification" {
   content = "\"google-site-verification=VP2XBnOcA-avhb_Nyp__WF-0AUSHtAIp-1JDfXTUQ58\""
   zone_id = cloudflare_zone.hockersten_se.id
 }
+
+resource "cloudflare_dns_record" "brevo_code" {
+  name    = "@"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  content = "\"brevo-code:adac91212964ad00fd332cb49559c2db\""
+  zone_id = cloudflare_zone.hockersten_se.id
+}
+
+resource "cloudflare_dns_record" "brevo_dkim_1" {
+  name    = "brevo1._domainkey"
+  proxied = false
+  ttl     = 3600
+  type    = "CNAME"
+  content = "b1.hockersten-se.dkim.brevo.com"
+  zone_id = cloudflare_zone.hockersten_se.id
+}
+
+resource "cloudflare_dns_record" "brevo_dkim_2" {
+  name    = "brevo2._domainkey"
+  proxied = false
+  ttl     = 3600
+  type    = "CNAME"
+  content = "b2.hockersten-se.dkim.brevo.com"
+  zone_id = cloudflare_zone.hockersten_se.id
+}
+
+resource "cloudflare_dns_record" "brevo_dmarc" {
+  name    = "_dmarc"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  content = "\"v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com\""
+  zone_id = cloudflare_zone.hockersten_se.id
+}

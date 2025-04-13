@@ -83,8 +83,19 @@ terraform apply -target google_cloud_run_domain_mapping.vaultwarden
 terraform apply
 ```
 
+## Email support
+
+Login to Brevo to get email credentials.
+
 The automation will have created the secrets necessary, but you still need to go into the Secret Manager UI and fill them in:
 https://console.cloud.google.com/security/secret-manager?invt=AbuoFg&project=vaultwarden-452515
+
+## Enabling admin mode
+
+The automation will have created the secrets necessary, but you still need to go into the Secret Manager UI and fill them in:
+https://console.cloud.google.com/security/secret-manager?invt=AbuoFg&project=vaultwarden-452515
+
+You also need to make sure ADMIN_TOKEN variable gets set. The code for this is currently commented out.
 
 ## Cloudflare hack 1
 

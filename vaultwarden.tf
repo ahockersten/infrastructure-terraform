@@ -32,6 +32,20 @@ resource "google_secret_manager_secret_iam_member" "secret_accessor_admin_token"
   depends_on = [google_secret_manager_secret.admin_token]
 }
 
+resource "google_secret_manager_secret" "smtp_password" {
+  secret_id = "smtp-password"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "secret_accessor_smtp_password" {
+  secret_id  = google_secret_manager_secret.smtp_password.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.vaultwarden_service_account.email}"
+  depends_on = [google_secret_manager_secret.smtp_password]
+}
+
 resource "google_cloud_run_v2_service" "vaultwarden" {
   provider             = google-beta
   name                 = "vaultwarden"
@@ -71,6 +85,35 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
       env {
         name  = "SIGNUPS_DOMAINS_WHITELIST"
         value = "hockersten.se"
+      }
+      env {
+        name  = "SMTP_HOST"
+        value = "smtp-relay.brevo.com"
+      }
+      env {
+        name  = "SMTP_PORT"
+        value = "587"
+      }
+      env {
+        name  = "SMTP_SECURITY"
+        value = "starttls"
+      }
+      env {
+        name  = "SMTP_FROM"
+        value = "noreply@hockersten.se"
+      }
+      env {
+        name  = "SMTP_USERNAME"
+        value = "8a4855001@smtp-brevo.com"
+      }
+      env {
+        name = "SMTP_PASSWORD"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.smtp_password.secret_id
+            version = "latest"
+          }
+        }
       }
       # enable this if you need access to the admin account for some reason
       #env {
