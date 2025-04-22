@@ -144,6 +144,12 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
     }
     service_account = google_service_account.vaultwarden_service_account.email
   }
+  lifecycle {
+    ignore_changes = [
+      // client gets changed whenever you do e.g. a manual deploy
+      client,
+    ]
+  }
 }
 
 resource "google_cloud_run_v2_job" "vaultwarden_backup" {
