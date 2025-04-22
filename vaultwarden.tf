@@ -52,7 +52,7 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
   location             = "europe-north1"
   deletion_protection  = false
   ingress              = "INGRESS_TRAFFIC_ALL"
-  launch_stage         = "BETA"
+  launch_stage         = "GA"
   default_uri_disabled = true
 
   template {
