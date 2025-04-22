@@ -1,4 +1,23 @@
-data "google_project" "project" {}
+resource "google_project" "vaultwarden" {
+  billing_account = "01601B-D26B44-151179"
+  name            = "vaultwarden"
+  project_id      = "vaultwarden-452515"
+}
+
+locals {
+  services = [
+    "run.googleapis.com",
+    "cloudscheduler.googleapis.com",
+    "secretmanager.googleapis.com",
+  ]
+
+}
+
+resource "google_project_service" "services" {
+  for_each = toset(local.services)
+  project  = google_project.vaultwarden.project_id
+  service  = each.value
+}
 
 # This is used so the backup scheduled job is allowed to start the cloud run job
 resource "google_service_account" "backup_job_service_account" {
@@ -7,7 +26,7 @@ resource "google_service_account" "backup_job_service_account" {
 }
 
 resource "google_project_iam_member" "cloudrun_job_executor" {
-  project = data.google_project.project.project_id
+  project = google_project.vaultwarden.project_id
   role    = "roles/run.jobsExecutor"
   member  = "serviceAccount:${google_service_account.backup_job_service_account.email}"
 }
@@ -200,7 +219,7 @@ resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
   # TODO change to europe-north1 when available
   # https://cloud.google.com/scheduler/docs/locations
   region  = "europe-west1"
-  project = data.google_project.project.project_id
+  project = google_project.vaultwarden.project_id
 
   retry_config {
     retry_count = 3
@@ -208,7 +227,7 @@ resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://${google_cloud_run_v2_job.vaultwarden_backup.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${data.google_project.project.project_id}/jobs/${google_cloud_run_v2_job.vaultwarden_backup.name}:run"
+    uri         = "https://${google_cloud_run_v2_job.vaultwarden_backup.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${google_project.vaultwarden.project_id}/jobs/${google_cloud_run_v2_job.vaultwarden_backup.name}:run"
 
     oauth_token {
       service_account_email = google_service_account.backup_job_service_account.email

@@ -25,5 +25,4 @@ provider "cloudflare" {
 }
 
 provider "google" {
-  project = "vaultwarden-452515"
 }

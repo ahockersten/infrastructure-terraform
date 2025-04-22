@@ -62,26 +62,16 @@ terraform apply tfplan
 
 # How Vaultwarden was setup
 
-First, I created a project in the Google console named `vaultwarden`. In my case it got named `vaultwarden-452515`.
-
-Enable Cloud Run API for it: https://console.cloud.google.com/apis/library/run.googleapis.com?project=vaultwarden-452515&inv=1&invt=Abq-gQ
-
-Enable Secret Manager API: https://console.cloud.google.com/apis/enableflow?apiid=secretmanager.googleapis.com&invt=AbuoDg&project=vaultwarden-452515
-
-Enable Cloud Scheduler API for it: https://console.cloud.google.com/apis/api/cloudscheduler.googleapis.com/overview?project=vaultwarden-452515&inv=1&invt=AbrjLg
-
-Verify the applicable domain: https://search.google.com/search-console/welcome?domain=hockersten.se
-
-
+Run:
 ```
 gcloud auth application-default login
-```
-
-Run
-```
 terraform apply -target google_cloud_run_domain_mapping.vaultwarden
 terraform apply
 ```
+
+## Verify domain
+
+Verify the applicable domain after Terraform has set it up: https://search.google.com/search-console/welcome?domain=hockersten.se
 
 ## Email support
 
