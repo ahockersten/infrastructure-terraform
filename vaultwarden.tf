@@ -6,17 +6,20 @@ resource "google_project" "vaultwarden" {
 
 locals {
   services = [
-    "run.googleapis.com",
+    "containerregistry.googleapis.com",
     "cloudscheduler.googleapis.com",
+    "run.googleapis.com",
     "secretmanager.googleapis.com",
   ]
 
 }
 
 resource "google_project_service" "services" {
-  for_each = toset(local.services)
-  project  = google_project.vaultwarden.project_id
-  service  = each.value
+  for_each                   = toset(local.services)
+  project                    = google_project.vaultwarden.project_id
+  service                    = each.value
+  disable_on_destroy         = false
+  disable_dependent_services = false
 }
 
 # This is used so the backup scheduled job is allowed to start the cloud run job
