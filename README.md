@@ -1,17 +1,21 @@
 # Initial setup
 
-## Installing prerequisites
-
 ## Adding a GitHub access token
 
-Go to GitHub and create an access token for access to the `ahockersten/tfstate` repo: https://github.com/settings/tokens
+Go to GitHub and create an access token for access to the all repos: https://github.com/settings/tokens
 
-It should be enough to give it access to:
+Give it access to:
 ```
+Administration
+  Access: Read and write
 Contents
   Access: Read and write
 Metadata
   Access: Read-only
+Variables
+  Access: Read and write
+Secrets
+  Access: Read and write
 ```
 
 ## Adding a Cloudflare access token for your account
@@ -30,6 +34,7 @@ Create a `terraform.tfvars`. It should contain:
 
 ```
 cloudflare_api_token = "<secret_token>"
+github_token = "<secret_token>"
 ```
 
 ## Creating a script for running terraform-backend-git
@@ -40,6 +45,58 @@ echo "export GIT_USERNAME=ahockersten" > terraform-backend-git.sh
 echo "export GITHUB_TOKEN=<token created in previous step>" >> terraform-backend-git.sh
 echo "terraform-backend-git" >> terraform-backend-git.sh
 chmod +x terraform-backend-git.sh
+```
+
+# Creating the necessary google credentials
+
+**NOTE!** You will probably need to run and rerun a bit depending on how the `terraform` commands go. You'll need projects to be created before you can use them below, but you might need the policy bindings to be created before you can resources in the projects.
+
+```
+export PROJECT_ID=vaultwarden-452515
+export GITHUB_ORG=ahockersten
+export EMAIL=anders.hockersten@gmail.com
+export REPO_NAME=vaultwarden-backup
+gcloud auth login
+
+# the policy bindings make sure the user account can run terraform correctly
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="user:${EMAIL}" \
+    --role="roles/iam.serviceAccountTokenCreator"
+
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="user:${EMAIL}" \
+    --role="roles/iam.workloadIdentityPoolAdmin"
+
+# this ensures workloads running on github can access the GAR for this repo.
+gcloud iam workload-identity-pools create "github" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --display-name="GitHub Actions Pool"
+
+export WORKLOAD_IDENTITY_POOL_ID=`gcloud iam workload-identity-pools describe "github" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --format="value(name)"`
+
+gcloud iam workload-identity-pools providers create-oidc "${REPO_NAME}" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --workload-identity-pool="github" \
+  --display-name="My GitHub repo Provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+  --attribute-condition="assertion.repository_owner == '${GITHUB_ORG}'" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --role="roles/artifactregistry.writer" \
+  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_ORG}/${REPO_NAME}"
+
+# The output from this command is what is needed to be entered into github workflows for $REPO_NAME
+gcloud iam workload-identity-pools providers describe ${REPO_NAME} \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --workload-identity-pool="github" \
+  --format="value(name)"
 ```
 
 # Running terraform

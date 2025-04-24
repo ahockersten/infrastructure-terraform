@@ -5,9 +5,11 @@ resource "google_project" "vaultwarden" {
 }
 
 locals {
+  location = "europe-north1"
   services = [
-    "containerregistry.googleapis.com",
+    "artifactregistry.googleapis.com",
     "cloudscheduler.googleapis.com",
+    "iamcredentials.googleapis.com",
     "run.googleapis.com",
     "secretmanager.googleapis.com",
   ]
@@ -71,7 +73,7 @@ resource "google_secret_manager_secret_iam_member" "secret_accessor_smtp_passwor
 resource "google_cloud_run_v2_service" "vaultwarden" {
   provider             = google-beta
   name                 = "vaultwarden"
-  location             = "europe-north1"
+  location             = local.location
   deletion_protection  = false
   ingress              = "INGRESS_TRAFFIC_ALL"
   launch_stage         = "GA"
@@ -166,6 +168,11 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
     }
     service_account = google_service_account.vaultwarden_service_account.email
   }
+  depends_on = [
+    google_artifact_registry_repository.docker_repo,
+    google_project_service.services,
+  ]
+
   lifecycle {
     ignore_changes = [
       // client gets changed whenever you do e.g. a manual deploy
@@ -176,7 +183,7 @@ resource "google_cloud_run_v2_service" "vaultwarden" {
 
 resource "google_cloud_run_v2_job" "vaultwarden_backup" {
   name                = "vaultwarden-backup-job"
-  location            = "europe-north1"
+  location            = local.location
   deletion_protection = false
 
   template {
@@ -184,8 +191,7 @@ resource "google_cloud_run_v2_job" "vaultwarden_backup" {
 
     template {
       containers {
-        image = "docker.io/ahockersten/vaultwarden-backup:latest"
-
+        image = "${google_artifact_registry_repository.docker_repo.location}-docker.pkg.dev/${google_artifact_registry_repository.docker_repo.project}/${google_artifact_registry_repository.docker_repo.repository_id}/vaultwarden-backup:latest"
         volume_mounts {
           name       = "bucket"
           mount_path = "/data"
@@ -211,6 +217,17 @@ resource "google_cloud_run_v2_job" "vaultwarden_backup" {
         }
       }
     }
+  }
+
+  depends_on = [
+    google_artifact_registry_repository.docker_repo,
+    google_project_service.services,
+  ]
+  lifecycle {
+    ignore_changes = [
+      // client gets changed whenever you do e.g. a manual deploy
+      client,
+    ]
   }
 }
 
@@ -240,7 +257,7 @@ resource "google_cloud_scheduler_job" "vaultwarden_backup_job" {
 
 resource "google_storage_bucket" "vaultwarden" {
   name                     = "ahockersten-vaultwarden-data"
-  location                 = "EUROPE-NORTH1"
+  location                 = local.location
   public_access_prevention = "enforced"
   lifecycle {
     prevent_destroy = true
@@ -270,7 +287,7 @@ resource "google_storage_bucket_iam_member" "backup_access_backup" {
 
 resource "google_storage_bucket" "vaultwarden_backup" {
   name                     = "ahockersten-vaultwarden-backup"
-  location                 = "EUROPE-NORTH1"
+  location                 = local.location
   public_access_prevention = "enforced"
   lifecycle_rule {
     action {
@@ -318,4 +335,82 @@ resource "cloudflare_dns_record" "vaultwarden_hockersten_se" {
   type    = each.value.type
   content = each.value.rrdata
   zone_id = cloudflare_zone.hockersten_se.id
+}
+
+resource "google_artifact_registry_repository" "docker_repo" {
+  # provider      = google-beta # Uncomment if using the beta provider
+  project       = google_project.vaultwarden.project_id
+  location      = local.location
+  repository_id = "vaultwarden"
+  description   = "Docker repository for vaultwarden"
+  format        = "DOCKER"
+
+  cleanup_policies {
+    id     = "keep-minimum-versions"
+    action = "KEEP"
+    most_recent_versions {
+      keep_count = 3
+    }
+  }
+
+  depends_on = [google_project_service.services["artifactregistry.googleapis.com"]]
+}
+
+resource "github_repository" "vaultwarden_backup" {
+  name          = "vaultwarden-backup"
+  description   = "A (very) simple container for doing Vaultwarden backups"
+  has_downloads = true
+  has_issues    = true
+  has_projects  = true
+  has_wiki      = true
+
+  visibility = "public"
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_project_id" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "GCP_PROJECT_ID"
+  value         = google_project.vaultwarden.project_id
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_gar_location" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "GAR_LOCATION"
+  value         = local.location
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_gar_repository" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "GAR_REPOSITORY"
+  value         = google_artifact_registry_repository.docker_repo.repository_id
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_image_name" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "IMAGE_NAME"
+  value         = "vaultwarden-backup"
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_pool_id" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "POOL_ID"
+  value         = "github"
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_provider_id" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "PROVIDER_ID"
+  value         = "vaultwarden-backup"
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_cloud_run_service_name" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "CLOUD_RUN_SERVICE_NAME"
+  value         = google_cloud_run_v2_job.vaultwarden_backup.name
+}
+
+resource "github_actions_variable" "vaultwarden_backup_env_cloud_run_region" {
+  repository    = github_repository.vaultwarden_backup.name
+  variable_name = "CLOUD_RUN_REGION"
+  value         = local.location
 }

@@ -1,0 +1,124 @@
+resource "google_project" "git_it_done" {
+  billing_account = "01601B-D26B44-151179"
+  name            = "git-it-done"
+  project_id      = "git-it-done-452515"
+}
+
+locals {
+  services = [
+    "artifactregistry.googleapis.com",
+    "cloudscheduler.googleapis.com",
+    "run.googleapis.com",
+    "secretmanager.googleapis.com",
+  ]
+}
+
+resource "google_project_service" "services" {
+  for_each                   = toset(local.services)
+  project                    = google_project.vaultwarden.project_id
+  service                    = each.value
+  disable_on_destroy         = false
+  disable_dependent_services = false
+}
+
+resource "google_cloud_run_v2_service" "git_it_done" {
+  provider             = google-beta
+  name                 = "git-it-done"
+  location             = "europe-north1"
+  deletion_protection  = false
+  ingress              = "INGRESS_TRAFFIC_ALL"
+  launch_stage         = "GA"
+  default_uri_disabled = true
+
+  template {
+    containers {
+      name  = "git-it-done"
+      image = "docker.io/ahockersten/git-it-done:latest"
+      ports {
+        container_port = 8080
+      }
+      resources {
+        cpu_idle = true
+
+        limits = {
+          cpu    = "1000m"
+          memory = "512Mi"
+        }
+      }
+      volume_mounts {
+        name       = "bucket"
+        mount_path = "/data"
+      }
+    }
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 2
+    }
+
+    volumes {
+      name = "bucket"
+      gcs {
+        bucket    = google_storage_bucket.git_it_done.name
+        read_only = false
+      }
+    }
+    service_account = google_service_account.service_account.email
+  }
+  lifecycle {
+    ignore_changes = [
+      // client gets changed whenever you do e.g. a manual deploy
+      client,
+    ]
+  }
+}
+
+resource "google_storage_bucket" "git_it_done" {
+  name                     = "ahockersten-git-it-done-data"
+  location                 = "EUROPE-NORTH1"
+  public_access_prevention = "enforced"
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# let git-it-done access its bucket
+resource "google_storage_bucket_iam_member" "git_it_done_access_git_it_done" {
+  bucket = google_storage_bucket.git_it_done.name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${google_service_account.service_account.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "noauth" {
+  location = google_cloud_run_v2_service.git_it_done.location
+  name     = google_cloud_run_v2_service.git_it_done.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+resource "google_cloud_run_domain_mapping" "git_it_done" {
+  location = google_cloud_run_v2_service.git_it_done.location
+  name     = "git-it-done.hockersten.se"
+
+  metadata {
+    namespace = google_cloud_run_v2_service.git_it_done.project
+  }
+
+  spec {
+    route_name = google_cloud_run_v2_service.git_it_done.name
+  }
+}
+
+
+resource "cloudflare_dns_record" "git_it_done_hockersten_se" {
+  for_each = {
+    for idx, record in google_cloud_run_domain_mapping.git_it_done.status[0].resource_records :
+    idx => record
+  }
+
+  name    = each.value.name != "" ? each.value.name : "git-it-done"
+  proxied = true
+  ttl     = 1
+  type    = each.value.type
+  content = each.value.rrdata
+  zone_id = cloudflare_zone.hockersten_se.id
+}

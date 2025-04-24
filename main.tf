@@ -4,6 +4,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
     google = {
       source  = "hashicorp/google"
       version = "~> 6.0"
@@ -22,6 +26,11 @@ terraform {
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+}
+
+provider "github" {
+  owner = "ahockersten"
+  token = var.github_token
 }
 
 provider "google" {
