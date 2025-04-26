@@ -56,6 +56,7 @@ export PROJECT_ID=vaultwarden-452515
 export GITHUB_ORG=ahockersten
 export EMAIL=anders.hockersten@gmail.com
 export REPO_NAME=vaultwarden-backup
+export POOL_ID=github
 gcloud auth login
 
 # the policy bindings make sure the user account can run terraform correctly
@@ -68,34 +69,49 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --role="roles/iam.workloadIdentityPoolAdmin"
 
 # this ensures workloads running on github can access the GAR for this repo.
-gcloud iam workload-identity-pools create "github" \
+gcloud iam workload-identity-pools create "${POOL_ID}" \
   --project="${PROJECT_ID}" \
   --location="global" \
   --display-name="GitHub Actions Pool"
 
-export WORKLOAD_IDENTITY_POOL_ID=`gcloud iam workload-identity-pools describe "github" \
+export WORKLOAD_IDENTITY_POOL_ID=`gcloud iam workload-identity-pools describe "${POOL_ID}" \
   --project="${PROJECT_ID}" \
   --location="global" \
   --format="value(name)"`
 
+export PROJECT_NUMBER=`echo $WORKLOAD_IDENTITY_POOL_ID | cut -d'/' -f2`
+
 gcloud iam workload-identity-pools providers create-oidc "${REPO_NAME}" \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --workload-identity-pool="github" \
+  --workload-identity-pool="${POOL_ID}" \
   --display-name="My GitHub repo Provider" \
   --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
   --attribute-condition="assertion.repository_owner == '${GITHUB_ORG}'" \
   --issuer-uri="https://token.actions.githubusercontent.com"
 
+# this allows uploading of an artifact from the repo
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/artifactregistry.writer" \
   --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_ORG}/${REPO_NAME}"
+
+# this allows deploying to cloud run
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --role="roles/run.developer" \
+  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_ORG}/${REPO_NAME}"
+
+# this is also needed to deploy to cloud run
+gcloud iam service-accounts add-iam-policy-binding \
+  ${PROJECT_NUMBER}-compute@developer.gserviceaccount.com \
+  --member="principal://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/subject/repo:${GITHUB_ORG}/${REPO_NAME}:ref:refs/heads/main" \
+  --role="roles/iam.serviceAccountUser" \
+  --project=${PROJECT_ID}
 
 # The output from this command is what is needed to be entered into github workflows for $REPO_NAME
 gcloud iam workload-identity-pools providers describe ${REPO_NAME} \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --workload-identity-pool="github" \
+  --workload-identity-pool="${POOL_ID}" \
   --format="value(name)"
 ```
 
