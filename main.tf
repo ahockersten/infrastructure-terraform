@@ -29,7 +29,7 @@ provider "cloudflare" {
 }
 
 provider "github" {
-  owner = "ahockersten"
+  owner = var.github_owner
   token = var.github_token
 }
 

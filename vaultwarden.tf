@@ -13,7 +13,6 @@ locals {
     "run.googleapis.com",
     "secretmanager.googleapis.com",
   ]
-
 }
 
 resource "google_project_service" "services" {
@@ -394,13 +393,13 @@ resource "github_actions_variable" "vaultwarden_backup_env_image_name" {
 resource "github_actions_variable" "vaultwarden_backup_env_pool_id" {
   repository    = github_repository.vaultwarden_backup.name
   variable_name = "POOL_ID"
-  value         = "github"
+  value         = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
 }
 
 resource "github_actions_variable" "vaultwarden_backup_env_provider_id" {
   repository    = github_repository.vaultwarden_backup.name
   variable_name = "PROVIDER_ID"
-  value         = "vaultwarden-backup"
+  value         = google_iam_workload_identity_pool_provider.github_provider.workload_identity_pool_provider_id
 }
 
 resource "github_actions_variable" "vaultwarden_backup_env_cloud_run_service_name" {
@@ -414,3 +413,84 @@ resource "github_actions_variable" "vaultwarden_backup_env_cloud_run_region" {
   variable_name = "CLOUD_RUN_REGION"
   value         = local.location
 }
+
+resource "google_project_iam_member" "user_sa_token_creator" {
+  project = google_project.vaultwarden.project_id
+  role    = "roles/iam.serviceAccountTokenCreator"
+  member  = "user:${var.user_email}"
+}
+
+resource "google_project_iam_member" "user_wi_pool_admin" {
+  project = google_project.vaultwarden.project_id
+  role    = "roles/iam.workloadIdentityPoolAdmin"
+  member  = "user:${var.user_email}"
+}
+
+# Workload Identity Pool
+resource "google_iam_workload_identity_pool" "github_pool" {
+  project                   = google_project.vaultwarden.project_id
+  workload_identity_pool_id = "github"
+  display_name              = "GitHub Actions Pool"
+  description               = "Workload Identity Pool for GitHub Actions"
+  depends_on = [
+    google_project_service.services["iam.googleapis.com"] // Ensure IAM API is enabled
+  ]
+}
+
+# Workload Identity Pool Provider for the specific repo
+resource "google_iam_workload_identity_pool_provider" "github_provider" {
+  project                            = google_project.vaultwarden.project_id
+  workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
+  workload_identity_pool_provider_id = github_repository.vaultwarden_backup.name
+  display_name                       = github_repository.vaultwarden_backup.name
+  description                        = "OIDC Provider for ${var.github_owner}/${github_repository.vaultwarden_backup.name}"
+  attribute_mapping = {
+    "google.subject"             = "assertion.sub"
+    "attribute.actor"            = "assertion.actor"
+    "attribute.repository"       = "assertion.repository"
+    "attribute.repository_owner" = "assertion.repository_owner"
+  }
+  attribute_condition = "assertion.repository_owner == '${var.github_owner}'"
+  oidc {
+    issuer_uri = "https://token.actions.githubusercontent.com"
+  }
+  depends_on = [google_iam_workload_identity_pool.github_pool]
+}
+
+# IAM binding for GitHub Actions to write to Artifact Registry
+resource "google_project_iam_member" "github_actions_artifact_writer" {
+  project = google_project.vaultwarden.project_id
+  role    = "roles/artifactregistry.writer"
+  member  = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_owner}/${github_repository.vaultwarden_backup.name}"
+  depends_on = [
+    google_iam_workload_identity_pool_provider.github_provider,
+    google_project_service.services["artifactregistry.googleapis.com"]
+  ]
+}
+
+
+/*
+These are not needed for this particular project, since we don't update the running image directly
+I'm keeping them since I will be needing them soon in another project
+resource "google_project_iam_member" "github_actions_run_developer" {
+  project = google_project.vaultwarden.project_id
+  role    = "roles/run.developer"
+  member  = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_owner}/${github_repository.vaultwarden_backup.name}"
+  depends_on = [
+    google_iam_workload_identity_pool_provider.github_provider,
+    google_project_service.services["run.googleapis.com"]
+  ]
+}
+
+# IAM binding for GitHub Actions to impersonate the Compute Engine default service account
+# This is often needed for Cloud Run deployments interacting with other GCP services.
+resource "google_service_account_iam_member" "github_actions_sa_user" {
+  # The default compute service account email format is {project_number}-compute@developer.gserviceaccount.com
+  service_account_id = "projects/${google_project.vaultwarden.project_id}/serviceAccounts/${google_project.vaultwarden.number}-compute@developer.gserviceaccount.com"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "principal://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/subject/repo:${var.github_owner}/${github_repository.vaultwarden_backup.name}:ref:refs/heads/main"
+  depends_on = [
+    google_iam_workload_identity_pool_provider.github_provider,
+  ]
+}
+*/
