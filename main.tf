@@ -34,4 +34,9 @@ provider "github" {
 }
 
 provider "google" {
+  # No specific configuration needed here if using default credentials/project
+}
+
+provider "google-beta" {
+  # No specific configuration needed here if using default credentials/project
 }
