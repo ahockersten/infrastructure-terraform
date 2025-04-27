@@ -225,7 +225,7 @@ resource "google_cloud_run_v2_job" "vaultwarden_backup" {
           read_only = false
         }
       }
-      service_account = google_service_account.backup_job_service_account.email # Added service account
+      service_account = google_service_account.backup_job_service_account.email
     }
   }
 
