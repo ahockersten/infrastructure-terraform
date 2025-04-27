@@ -33,3 +33,4 @@ tfplan
 
 # Script used for running terraform-backend-git
 /terraform-backend-git.sh
+.aider*
