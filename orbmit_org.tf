@@ -42,11 +42,6 @@ resource "cloudflare_zone" "orbmit_org" {
 #  zone_id = cloudflare_zone.orbmit_org.id
 #}
 
-moved {
-  from = cloudflare_dns_record.terraform_managed_resource_2a97fa825df567175732d4d8c018c780
-  to   = cloudflare_dns_record.dkim1_orbmit_org
-}
-
 resource "cloudflare_dns_record" "dkim1_orbmit_org" {
   name    = "fm1._domainkey"
   proxied = false
@@ -54,11 +49,6 @@ resource "cloudflare_dns_record" "dkim1_orbmit_org" {
   type    = "CNAME"
   content = "fm1.orbmit.org.dkim.fmhosted.com"
   zone_id = cloudflare_zone.orbmit_org.id
-}
-
-moved {
-  from = cloudflare_dns_record.terraform_managed_resource_e82e916cf069d40a54af088f1759fd62
-  to   = cloudflare_dns_record.dkim2_orbmit_org
 }
 
 resource "cloudflare_dns_record" "dkim2_orbmit_org" {
@@ -70,11 +60,6 @@ resource "cloudflare_dns_record" "dkim2_orbmit_org" {
   zone_id = cloudflare_zone.orbmit_org.id
 }
 
-moved {
-  from = cloudflare_dns_record.terraform_managed_resource_e5926d9d899bcb5cf66cee4c6025b2e0
-  to   = cloudflare_dns_record.dkim3_orbmit_org
-}
-
 resource "cloudflare_dns_record" "dkim3_orbmit_org" {
   name    = "fm3._domainkey"
   proxied = false
@@ -82,11 +67,6 @@ resource "cloudflare_dns_record" "dkim3_orbmit_org" {
   type    = "CNAME"
   content = "fm3.orbmit.org.dkim.fmhosted.com"
   zone_id = cloudflare_zone.orbmit_org.id
-}
-
-moved {
-  from = cloudflare_dns_record.terraform_managed_resource_c941ed3dcfc115da581b5a7f1d85c222
-  to   = cloudflare_dns_record.mx2_orbmit_org
 }
 
 resource "cloudflare_dns_record" "mx2_orbmit_org" {
@@ -99,11 +79,6 @@ resource "cloudflare_dns_record" "mx2_orbmit_org" {
   zone_id  = cloudflare_zone.orbmit_org.id
 }
 
-moved {
-  from = cloudflare_dns_record.terraform_managed_resource_bb9d8de57f82edbbab8ba1f59aa25558
-  to   = cloudflare_dns_record.mx1_orbmit_org
-}
-
 resource "cloudflare_dns_record" "mx1_orbmit_org" {
   name     = "orbmit.org"
   priority = 10
@@ -112,11 +87,6 @@ resource "cloudflare_dns_record" "mx1_orbmit_org" {
   type     = "MX"
   content  = "in1-smtp.messagingengine.com"
   zone_id  = cloudflare_zone.orbmit_org.id
-}
-
-moved {
-  from = cloudflare_dns_record.terraform_managed_resource_96f9f6ddfcff08445f4e1a71dbbffdbe
-  to   = cloudflare_dns_record.spf_orbmit_org
 }
 
 resource "cloudflare_dns_record" "spf_orbmit_org" {
