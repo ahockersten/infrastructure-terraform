@@ -6,7 +6,12 @@ resource "cloudflare_zone" "hoeckersten_se" {
   name = "höckersten.se"
 }
 
-resource "cloudflare_dns_record" "terraform_managed_resource_736e6a4a3c2667a4c754e5a5608f1e0f" {
+moved {
+  from = cloudflare_dns_record.terraform_managed_resource_736e6a4a3c2667a4c754e5a5608f1e0f
+  to   = cloudflare_dns_record.dkim1_hoeckersten_se
+}
+
+resource "cloudflare_dns_record" "dkim1_hoeckersten_se" {
   name    = "fm1._domainkey"
   proxied = false
   ttl     = 1
@@ -15,7 +20,12 @@ resource "cloudflare_dns_record" "terraform_managed_resource_736e6a4a3c2667a4c75
   zone_id = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_dns_record" "terraform_managed_resource_2bcefad424bdbfed5b4a77ee06bbd194" {
+moved {
+  from = cloudflare_dns_record.terraform_managed_resource_2bcefad424bdbfed5b4a77ee06bbd194
+  to   = cloudflare_dns_record.dkim2_hoeckersten_se
+}
+
+resource "cloudflare_dns_record" "dkim2_hoeckersten_se" {
   name    = "fm2._domainkey"
   proxied = false
   ttl     = 1
@@ -24,7 +34,12 @@ resource "cloudflare_dns_record" "terraform_managed_resource_2bcefad424bdbfed5b4
   zone_id = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_dns_record" "terraform_managed_resource_fa4f4c05b39d5647083c1be0ea154ba8" {
+moved {
+  from = cloudflare_dns_record.terraform_managed_resource_fa4f4c05b39d5647083c1be0ea154ba8
+  to   = cloudflare_dns_record.dkim3_hoeckersten_se
+}
+
+resource "cloudflare_dns_record" "dkim3_hoeckersten_se" {
   name    = "fm3._domainkey"
   proxied = false
   ttl     = 1
@@ -33,7 +48,12 @@ resource "cloudflare_dns_record" "terraform_managed_resource_fa4f4c05b39d5647083
   zone_id = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_dns_record" "terraform_managed_resource_d0a1368a33e4130d91453fdc3d206c27" {
+moved {
+  from = cloudflare_dns_record.terraform_managed_resource_d0a1368a33e4130d91453fdc3d206c27
+  to   = cloudflare_dns_record.mx1_hoeckersten_se
+}
+
+resource "cloudflare_dns_record" "mx1_hoeckersten_se" {
   name     = "xn--hckersten-07a.se"
   priority = 10
   proxied  = false
@@ -43,7 +63,12 @@ resource "cloudflare_dns_record" "terraform_managed_resource_d0a1368a33e4130d914
   zone_id  = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_dns_record" "terraform_managed_resource_2bcbf64fdcab6c164d5b09f3baf87971" {
+moved {
+  from = cloudflare_dns_record.terraform_managed_resource_2bcbf64fdcab6c164d5b09f3baf87971
+  to   = cloudflare_dns_record.mx2_hoeckersten_se
+}
+
+resource "cloudflare_dns_record" "mx2_hoeckersten_se" {
   name     = "xn--hckersten-07a.se"
   priority = 20
   proxied  = false
@@ -53,7 +78,12 @@ resource "cloudflare_dns_record" "terraform_managed_resource_2bcbf64fdcab6c164d5
   zone_id  = cloudflare_zone.hoeckersten_se.id
 }
 
-resource "cloudflare_dns_record" "terraform_managed_resource_15b5a5e062a88adcfc6e921c340b0629" {
+moved {
+  from = cloudflare_dns_record.terraform_managed_resource_15b5a5e062a88adcfc6e921c340b0629
+  to   = cloudflare_dns_record.spf_hoeckersten_se
+}
+
+resource "cloudflare_dns_record" "spf_hoeckersten_se" {
   name    = "xn--hckersten-07a.se"
   proxied = false
   ttl     = 1
