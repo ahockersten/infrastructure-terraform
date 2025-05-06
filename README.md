@@ -71,7 +71,7 @@ terraform apply tfplan
 Run:
 ```
 gcloud auth application-default login
-terraform apply -target google_cloud_run_domain_mapping.vaultwarden
+terraform apply -target module.vaultwarden.google_cloud_run_domain_mapping.vaultwarden
 terraform apply
 ```
 
@@ -139,3 +139,13 @@ curl -X PATCH \
 ## Cloudflare hack 2
 
 I needed to change the SSL/TLS encryption from "automatic" to "full" after Google had issued the certificate. Then I could change it back again. Probably Cloudflare had sorted itself out if I had just waited?
+
+# How git-it-done was setup
+
+```
+gcloud auth application-default login
+terraform apply -target module.git-it-done.google_cloud_run_domain_mapping.git_it_done
+terraform apply
+```
+
+You may need to do this multiple times.

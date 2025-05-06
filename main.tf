@@ -39,6 +39,22 @@ provider "google" {
 provider "google-beta" {
 }
 
+module "git_it_done" {
+  source = "./modules/git_it_done"
+
+  billing_account    = var.gcp_billing_account
+  user_email         = var.user_email
+  github_owner       = var.github_owner
+  cloudflare_zone_id = cloudflare_zone.hockersten_se.id
+
+  providers = {
+    google      = google
+    google-beta = google-beta
+    github      = github
+    cloudflare  = cloudflare
+  }
+}
+
 module "vaultwarden" {
   source = "./modules/vaultwarden"
 

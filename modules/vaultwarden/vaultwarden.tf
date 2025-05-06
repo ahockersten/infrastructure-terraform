@@ -485,30 +485,3 @@ resource "google_project_iam_member" "github_actions_artifact_writer" {
     google_project_service.services["artifactregistry.googleapis.com"]
   ]
 }
-
-
-/*
-These are not needed for this particular project, since we don't update the running image directly
-I'm keeping them since I will be needing them soon in another project
-resource "google_project_iam_member" "github_actions_run_developer" {
-  project = google_project.vaultwarden.project_id
-  role    = "roles/run.developer"
-  member  = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_owner}/${github_repository.vaultwarden_backup.name}"
-  depends_on = [
-    google_iam_workload_identity_pool_provider.github_provider,
-    google_project_service.services["run.googleapis.com"]
-  ]
-}
-
-# IAM binding for GitHub Actions to impersonate the Compute Engine default service account
-# This is often needed for Cloud Run deployments interacting with other GCP services.
-resource "google_service_account_iam_member" "github_actions_sa_user" {
-  # The default compute service account email format is {project_number}-compute@developer.gserviceaccount.com
-  service_account_id = "projects/${google_project.vaultwarden.project_id}/serviceAccounts/${google_project.vaultwarden.number}-compute@developer.gserviceaccount.com"
-  role               = "roles/iam.serviceAccountUser"
-  member             = "principal://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/subject/repo:${var.github_owner}/${github_repository.vaultwarden_backup.name}:ref:refs/heads/main"
-  depends_on = [
-    google_iam_workload_identity_pool_provider.github_provider,
-  ]
-}
-*/
